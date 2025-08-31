@@ -13,12 +13,13 @@ header {
 }
 main {
     padding: 2rem;
+    padding-bottom: 4rem; /* Prevents footer overlap */
 }
 footer {
     background: #222;
     color: #fff;
     text-align: center;
-    padding: 1rem;
+    padding: 0.1rem;
     position: fixed;
     width: 100%;
     bottom: 0;

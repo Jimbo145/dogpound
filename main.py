@@ -47,7 +47,7 @@ class Week:
         self.bench_points = []
         if last_week == None:
             self.balance = []
-            for i in range(12):
+            for i in range(13):
                 self.balance.append(0)
         else:
             self.balance = last_week["balance"]
@@ -59,7 +59,7 @@ class Week:
         if num_items == 1:
             self.balance[team_results[0].team_id] += 10
         elif num_items > 1:
-            for i in range(num_items):
+            for i in range(num_items + 1):
                 self.balance[team_results[i].team_id] += (10 / num_items)
 
     def set_highest_bench_points(self, team_results):
