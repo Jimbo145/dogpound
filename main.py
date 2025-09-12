@@ -7,7 +7,7 @@ from espn_api.football import League
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-season_year = 2024
+season_year = 2025
 
 class TeamResult:
     def __init__(self, team_id, points):
@@ -57,10 +57,10 @@ class Week:
         self.highest_points = team_results
         num_items = len(team_results)
         if num_items == 1:
-            self.balance[team_results[0].team_id] += 10
+            self.balance[team_results[0].team_id] += 30
         elif num_items > 1:
             for i in range(num_items + 1):
-                self.balance[team_results[i].team_id] += (10 / num_items)
+                self.balance[team_results[i].team_id] += (30 / num_items)
 
     def set_highest_bench_points(self, team_results):
         self.highest_bench_points = team_results
@@ -159,9 +159,9 @@ def resolve_team_names(week_number, this_week: Week, league: League):
             this_week.append_team_name(str(away_team_id), boxScore.away_team.team_name)
 
 def main():
-    league = League(league_id=1173078, year=2024, espn_s2=ESPN_S2,swid=ESPN_SWID)
+    league = League(league_id=1173078, year=season_year, espn_s2=ESPN_S2,swid=ESPN_SWID)
     #week_number = league.current_week
-    week_number = 17
+    week_number = 0
 
     # Example: Connect to Firestore
     db = get_firestore_client()
@@ -178,7 +178,7 @@ def main():
     resolve_team_names(week_number, this_week, league)
 
     print(this_week.to_dict())
-    doc_ref = db.collection("data").document("2024")
+    doc_ref = db.collection("data").document(str(season_year))
     doc_ref.set({"week."+ str(week_number): this_week.to_dict()},merge=True)
 
 if __name__ == "__main__":

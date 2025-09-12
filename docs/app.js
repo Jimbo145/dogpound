@@ -156,10 +156,17 @@ document.addEventListener('DOMContentLoaded', function() {
             option.textContent = y;
             yearSelector.appendChild(option);
         });
-        if (yearSelector.options.length > 0) {
-            yearSelector.selectedIndex = 0;
-            yearSelector.dispatchEvent(new Event('change'));
-        }
+            if (yearSelector.options.length > 0) {
+                // Find the largest year and select it
+                let largestYear = Math.max(...ids.map(y => parseInt(y, 10)));
+                for (let i = 0; i < yearSelector.options.length; i++) {
+                    if (parseInt(yearSelector.options[i].value, 10) === largestYear) {
+                        yearSelector.selectedIndex = i;
+                        break;
+                    }
+                }
+                yearSelector.dispatchEvent(new Event('change'));
+            }
     });
 
     async function setWeekOptions() {
