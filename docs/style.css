@@ -24,3 +24,24 @@ footer {
     width: 100%;
     bottom: 0;
 }
+
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    margin-bottom: 1.5rem;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 0.6em 1em;
+    text-align: left;
+}
+th {
+    background: #f0f0f0;
+    font-weight: bold;
+}
+tr:nth-child(even) {
+    background: #f9f9f9;
+}

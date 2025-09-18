@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
             topScorerElem.removeChild(topScorerElem.firstChild);
         }
 
-        topScorerElem.appendChild(document.createElement('h2')).textContent = 'Top Scorer';
+        topScorerElem.appendChild(document.createElement('h2')).textContent = 'Weekly Top Scorer';
 
         for (const item of docSnap.data()[weekKey]['highest_points']) {
             const teamName = await getTeamName(item.team_id, year, weekKey);
@@ -98,6 +98,39 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    async function setMostOverallPoints(year, weekKey) {
+        const docRef = doc(db, "data", year);
+        const docSnap = await getDoc(docRef);
+        const overallPointsElem = document.getElementById('overall-points-container');
+        const overallTableElem = document.getElementById('overall-points-table');
+
+
+        //clear existing elements
+        while (overallTableElem.firstChild) {
+            overallTableElem.removeChild(overallTableElem.firstChild);
+        }
+
+        var overallPointsList = docSnap.data()[weekKey]['total_points'];
+
+        var table_col = document.createElement('tr')
+        table_col.appendChild(document.createElement('th')).textContent = "Position";
+        table_col.appendChild(document.createElement('th')).textContent = "Overall Points";
+        table_col.appendChild(document.createElement('th')).textContent = "Team Name";
+
+        var i = 0;
+        for (const item of overallPointsList) {
+            i += 1;
+            const teamName = await getTeamName(item.team_id, year, weekKey);
+            table_col = document.createElement('tr')
+
+            table_col.appendChild(document.createElement('td')).textContent = ""+i;
+            table_col.appendChild(document.createElement('td')).textContent = item.points;
+            table_col.appendChild(document.createElement('td')).textContent = teamName;
+
+            overallTableElem.appendChild(table_col);
+        }
+    }
+
     async function setBalanceTable(year, weekKey) {
         const docRef = doc(db, "data", year);
         const docSnap = await getDoc(docRef);
@@ -117,18 +150,21 @@ document.addEventListener('DOMContentLoaded', function() {
         table_col.appendChild(document.createElement('th')).textContent = "Team";
         table_col.appendChild(document.createElement('th')).textContent = "Balance";
    
-
-        for (let idx = 1; idx < balanceList.length; idx++) { // skip element 0
-            const item = balanceList[idx];
-            const teamName = await getTeamName(idx, year, weekKey);
-
-            table_col = document.createElement('tr');
-            table_col.appendChild(document.createElement('td')).textContent = teamName;
-            table_col.appendChild(document.createElement('td')).textContent = "$" + item;
-
-            balanceTableElem.appendChild(table_col);
+        const teamNames = docSnap.data()[weekKey]['teams_names'];
+        Object.entries(teamNames).forEach(([teamId, teamName]) => {
+            let balance = balanceList[teamId];
+            if (balance == undefined) {
+                balance = 0;
+            }
+            const row = document.createElement('tr');
+            row.setAttribute('data-team-id', teamId);
+            row.appendChild(document.createElement('td')).textContent = teamName;
+            row.appendChild(document.createElement('td')).textContent = "$" + balance;
+            balanceTableElem.appendChild(row);
             
-        }
+        });
+
+        
     }
 
     weekSelector.addEventListener('change', function() {
@@ -136,6 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const weekKey = weekSelector.value;
         console.log("selected year:", year, "week:", weekKey);
         setTopScorer(year, weekKey);
+        setMostOverallPoints(year, weekKey);
         setTopBench(year, weekKey);
         setBenchScores(year, weekKey);
         setBalanceTable(year, weekKey);
@@ -205,9 +242,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Assumes a "teams" collection with documents keyed by team_id and a "name" field
         const docRef = doc(db, "data", year);
         const docSnap = await getDoc(docRef);
-        console.log("Document snapshot:", docSnap.data()[weekKey]['teams_names']);
-        console.log(teamId)
-        console.log(docSnap.data()[weekKey]['teams_names'][''+teamId]);
 
         var teamName = docSnap.data()[weekKey]['teams_names'][teamId];
         
